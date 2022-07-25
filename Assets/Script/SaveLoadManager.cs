@@ -8,8 +8,6 @@ using SX3Game.Editor;
 using System.Threading;
 using System.Threading.Tasks;
 
-//test saveloadtask
-
 public class SaveLoadManager : MonoBehaviour
 {
     public List<GameNode> gameNodeList;
@@ -104,13 +102,8 @@ public class SaveLoadManager : MonoBehaviour
         #endregion
     }
 
-    public IEnumerator Load(string path)
+    public void Load(string path)
     {
-        System.Diagnostics.Stopwatch totalTimeStopwatch = new();
-        System.Diagnostics.Stopwatch nodeSplitStopWatch = new();
-        System.Diagnostics.Stopwatch convertNodeBuilderStopwatch = new();
-        System.Diagnostics.Stopwatch nodeBuilderStopwatch = new();
-
         StreamReader streamReader = new(path);
 
         var nodeData = streamReader.ReadToEnd();
@@ -119,26 +112,19 @@ public class SaveLoadManager : MonoBehaviour
 
         nodeList.RemoveAt(nodeList.Count - 1);
 
-        totalTimeStopwatch.Start();
 
         for (int i = 0; i < nodeList.Count; i++)
         {
-            nodeSplitStopWatch.Start();
             var node = nodeList[i].Split(separator: dataSeparator);
-            nodeSplitStopWatch.Stop();
 
             switch (ConvertToNodeType(node[0]))
             {
                 case EGameNodeType.None:
                     break;
                 case EGameNodeType.Bullet:
-                    convertNodeBuilderStopwatch.Start();
                     NodeBuilder builder = ConvertNodeBuilder(node);
-                    convertNodeBuilderStopwatch.Stop();
 
-                    nodeBuilderStopwatch.Start();
                     builder.BuildBullet();
-                    nodeBuilderStopwatch.Stop();
 
                     break;
                 case EGameNodeType.Laser:
@@ -153,26 +139,6 @@ public class SaveLoadManager : MonoBehaviour
 
 
         }
-        totalTimeStopwatch.Stop();
-
-        yield return wait;
-
-        System.Text.StringBuilder stringBuilder = new();
-
-        var totalTime = totalTimeStopwatch.ElapsedTicks;
-        var nodeSplitTime = nodeSplitStopWatch.ElapsedTicks;
-        var convertTime = convertNodeBuilderStopwatch.ElapsedTicks;
-        var nodeBuilderTime = nodeBuilderStopwatch.ElapsedTicks;
-        var convertAndBuiler = convertTime + nodeBuilderTime;
-
-        stringBuilder.AppendLine($"totalTime:\n{totalTime}")
-            .AppendLine($"ConvertNodeTime:\n{convertTime}({(float)convertTime / totalTime})")
-            .AppendLine($"NodeSplitTime:\n{nodeSplitTime}({(float)nodeSplitTime / totalTime})")
-            .AppendLine($"NodeBuilderTime:\n{nodeBuilderTime}({(float)nodeBuilderTime / totalTime})")
-            .AppendLine($"Convert+Builder:\n{convertAndBuiler}({(float)convertAndBuiler / totalTime})")
-            ;
-
-        Debug.Log(stringBuilder);
     }
     // 'type,time,startpos,angle,speed'
 
