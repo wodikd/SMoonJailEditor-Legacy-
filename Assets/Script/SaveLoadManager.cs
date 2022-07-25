@@ -104,7 +104,9 @@ public class SaveLoadManager : MonoBehaviour
 
     public void Load(string path)
     {
-        const int threadCount = 4;
+        System.Diagnostics.Stopwatch totalTimeStopwatch = new();
+
+        const int threadCount = 1;
 
         Queue<NodeBuilder> nodeBuilderQueue = new();
 
@@ -118,6 +120,7 @@ public class SaveLoadManager : MonoBehaviour
         var listCount = 0;
 
         List<Thread> threadList = new();
+
 
         for (int i = 0; i < threadCount; i++)
         {
@@ -135,15 +138,22 @@ public class SaveLoadManager : MonoBehaviour
             thread.Start();
         }
 
+        totalTimeStopwatch.Start();
+
         foreach (var thread in threadList)
         {
             thread.Join();
         }
 
+        totalTimeStopwatch.Stop();
+
         for (int i = 0; i < nodeBuilderQueue.Count; i++)
         {
             nodeBuilderQueue.Dequeue().BuildBullet();
         }
+
+
+        Debug.Log(totalTimeStopwatch.ElapsedTicks);
 
         #region Legacy
 
