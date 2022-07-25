@@ -8,6 +8,8 @@ using SX3Game.Editor;
 using System.Threading;
 using System.Threading.Tasks;
 
+//test saveloadtask
+
 public class SaveLoadManager : MonoBehaviour
 {
     public List<GameNode> gameNodeList;
