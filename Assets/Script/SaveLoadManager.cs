@@ -104,15 +104,89 @@ public class SaveLoadManager : MonoBehaviour
 
     public void Load(string path)
     {
-        StreamReader streamReader = new(path);
+        const int threadCount = 4;
 
+        Queue<NodeBuilder> nodeBuilderQueue = new();
+
+        StreamReader streamReader = new(path);
         var nodeData = streamReader.ReadToEnd();
-        
         var nodeList = new List<string>(nodeData.Split(separator: nodeSeparator));
 
         nodeList.RemoveAt(nodeList.Count - 1);
 
+        var listRange = nodeList.Count / threadCount;
+        var listCount = 0;
 
+        List<Thread> threadList = new();
+
+        for (int i = 0; i < threadCount; i++)
+        {
+            List<string> newNodeList = new();
+
+            for (; listCount < nodeList.Count && listCount < (listCount + listRange); listCount++)
+            {
+                newNodeList.Add(nodeList[listCount]);
+            }
+
+            Thread thread = new(
+                () => MyThread(newNodeList, ref nodeBuilderQueue)
+                );
+            threadList.Add(thread);
+            thread.Start();
+        }
+
+        foreach (var thread in threadList)
+        {
+            thread.Join();
+        }
+
+        for (int i = 0; i < nodeBuilderQueue.Count; i++)
+        {
+            nodeBuilderQueue.Dequeue().BuildBullet();
+        }
+
+        #region Legacy
+
+        //StreamReader streamReader = new(path);
+
+        //var nodeData = streamReader.ReadToEnd();
+
+        //var nodeList = new List<string>(nodeData.Split(separator: nodeSeparator));
+
+        //nodeList.RemoveAt(nodeList.Count - 1);
+
+        //for (int i = 0; i < nodeList.Count; i++)
+        //{
+        //    var node = nodeList[i].Split(separator: dataSeparator);
+
+        //    switch (ConvertToNodeType(node[0]))
+        //    {
+        //        case EGameNodeType.None:
+        //            break;
+        //        case EGameNodeType.Bullet:
+        //            NodeBuilder builder = ConvertNodeBuilder(node);
+
+        //            builder.BuildBullet();
+
+        //            break;
+        //        case EGameNodeType.Laser:
+        //            break;
+        //        case EGameNodeType.Bomb:
+        //            break;
+        //        default:
+        //            break;
+        //    }
+
+        //    //Debug.Log($"{(((float)i + 1) / nodeList.Count) * 100,0:0.0}%");
+
+
+        //}
+
+        #endregion
+    }
+
+    private void MyThread(List<string> nodeList, ref Queue<NodeBuilder> nodeBuilderQueue)
+    {
         for (int i = 0; i < nodeList.Count; i++)
         {
             var node = nodeList[i].Split(separator: dataSeparator);
@@ -122,9 +196,7 @@ public class SaveLoadManager : MonoBehaviour
                 case EGameNodeType.None:
                     break;
                 case EGameNodeType.Bullet:
-                    NodeBuilder builder = ConvertNodeBuilder(node);
-
-                    builder.BuildBullet();
+                    nodeBuilderQueue.Enqueue(ConvertNodeBuilder(node));
 
                     break;
                 case EGameNodeType.Laser:
@@ -135,11 +207,10 @@ public class SaveLoadManager : MonoBehaviour
                     break;
             }
 
-            //Debug.Log($"{(((float)i + 1) / nodeList.Count) * 100,0:0.0}%");
-
-
+            Thread.Sleep(1);
         }
     }
+
     // 'type,time,startpos,angle,speed'
 
     public void MakeBullet(float time, Vector2 startPos, float angle, float speed)

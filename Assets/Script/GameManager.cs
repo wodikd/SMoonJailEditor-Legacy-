@@ -117,11 +117,15 @@ public class GameManager : MonoBehaviour
 
             DeleteNode();
 
-            StartCoroutine(
-                SLManager.Load(
+            SLManager.Load(
                 path: Application.dataPath + dataPath
-                )
-            );
+                );
+
+            //StartCoroutine(
+            //    SLManager.Load(
+            //    path: Application.dataPath + dataPath
+            //    )
+            //);
 
         }
         if (Input.GetKeyDown(KeyCode.C))
