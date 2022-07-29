@@ -195,6 +195,10 @@ public class SaveLoadManager : MonoBehaviour
         #endregion
     }
 
+    public void UpLaod(string path)
+    {
+
+    }
     private void MyThread(List<string> nodeList, ref Queue<NodeBuilder> nodeBuilderQueue)
     {
         for (int i = 0; i < nodeList.Count; i++)
