@@ -106,7 +106,7 @@ public class SaveLoadManager : MonoBehaviour
     {
         System.Diagnostics.Stopwatch totalTimeStopwatch = new();
 
-        const int threadCount = 1;
+        const int threadCount = 100;
 
         Queue<NodeBuilder> nodeBuilderQueue = new();
 
@@ -221,7 +221,7 @@ public class SaveLoadManager : MonoBehaviour
                     break;
             }
 
-            Thread.Sleep(1);
+            Thread.Sleep(100);
         }
     }
 
