@@ -4,8 +4,9 @@ using System.IO;
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using SX3Game.Editor;
-using SX3Game;
+using SMoonJail.Editor;
+using SMoonJail;
+using GameTool;
 
 // using UnityScene = UnityEngine.SceneManagement;
 //Todo:
@@ -35,6 +36,8 @@ public class GameManager : MonoBehaviour
 
     public static List<GameNode> gameNodeList = new List<GameNode>();
 
+    private static bool isOnUI;
+
     private static GameManager gameManager;
     private static SaveLoadManager SLManager;
 
@@ -56,7 +59,7 @@ public class GameManager : MonoBehaviour
         LoadSceneAdditive("Timeline");
         LoadSceneAdditive("ObjectEditor");
 
-        StartCoroutine(GetCamera());
+        StartCoroutine(LateAwake());
 
         MouseCursor.SetCursorBehavior(MouseCursor.ECursorBehavior.Select);
 
@@ -87,13 +90,12 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         timelineManager = FindObjectOfType<TimelineMangaer>();
-
     }
 
     // Update is called once per frame
     void Update()
     {
-        bool onUI = UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+        isOnUI = UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -130,19 +132,9 @@ public class GameManager : MonoBehaviour
 
             DeleteNode();
         }
-        if (!onUI)
+        if (!isOnUI)
         {
-            if (Input.GetMouseButton(2))
-            {
-
-                var mouseXDelta = Input.GetAxisRaw("Mouse X");
-                var mouseYDelta = Input.GetAxisRaw("Mouse Y");
-
-                inGameCamera.transform.position += new Vector3(-mouseXDelta, -mouseYDelta);
-
-            }
-
-            inGameCamera.orthographicSize += Input.GetAxisRaw("Mouse ScrollWheel");
+            
         }
 
         if (Input.GetKeyDown(KeyCode.Delete))
@@ -159,7 +151,20 @@ public class GameManager : MonoBehaviour
         {
 
         }
-        
+
+        //[UnityEditor.MenuItem()]
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            var value1 = mapInfo.BPM / 60f;
+            var value2 = 0.25f / value1;
+
+            //Debuger.Log($"{value1}, {value2}, {value2 * 620}");
+            //float GetBeatCount(float BPM, int beat)
+            //{
+            //    var value = 4 / beat;
+            //    return BPM / value;
+            //}
+        }
 
         MouseCursor.cursorBehavior();
     }
@@ -177,8 +182,6 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < GameNodeList.Count; i++)
         {
-            Debug.Log(GameNodeList[i].Time);
-            
             GameNodeList[i].UpdatePosition();
         }
     }
@@ -219,8 +222,7 @@ public class GameManager : MonoBehaviour
         objectEditorCamera.rect = new Rect(rect.x + rect.width, rect.y, 1 - rect.width, rect.height);
         timelineCamera.rect = new Rect(0, 0, 1, 1 - rect.height);
     }
-
-    private IEnumerator GetCamera()
+    private IEnumerator LateAwake()
     {
         while (true)
         {
@@ -235,9 +237,41 @@ public class GameManager : MonoBehaviour
             {
                 RegulateViewport(inGameCamera.rect);
 
+                StartCoroutine(MoveCamera());
+
                 break;
             }
         }
+    }
+
+    private IEnumerator MoveCamera()
+    {
+        var oldPos = InputTool.WorldCursorPos(inGameCamera);
+
+        while (true)
+        {
+            if (!isOnUI)
+            {
+                if (Input.GetMouseButton(2))
+                {
+                    var newPos = InputTool.WorldCursorPos(inGameCamera);
+
+                    var deltaPos = oldPos - newPos;
+
+                    Debugger.Log(deltaPos);
+
+                    inGameCamera.transform.position += (Vector3)deltaPos;
+
+                }
+
+                inGameCamera.orthographicSize -= Input.GetAxisRaw("Mouse ScrollWheel") * 5;
+
+                oldPos = InputTool.WorldCursorPos(inGameCamera);
+            }
+
+            yield return null;
+        }
+        
     }
 
     public static GameManager GetManager
@@ -288,15 +322,6 @@ public class GameManager : MonoBehaviour
         {
             return gameNodeList;
         }
-    }
-
-    [System.Serializable]
-    public struct MapInfo
-    {
-        public string Name;
-        public string MusicName;
-        public string Difficulty;
-        public float BPM;
     }
 
     // public void AdditiveScene(eSCENE_TYPE _sceneType)

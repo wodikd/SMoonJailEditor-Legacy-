@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SX3Game
+namespace SMoonJail
 {
     class Bomb : GameNode
     {
@@ -9,16 +9,16 @@ namespace SX3Game
             
         }
 
-        public override void UpdateNode()
+        public override void UpdateValue()
         {
             
         }
 
-        public override EGameNodeType GetNodeType
+        public override GameNodeType GetNodeType
         { 
             get
             {
-                return EGameNodeType.Bomb;
+                return GameNodeType.Bomb;
             }
         }
     }

@@ -2,26 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SX3Game
+namespace SMoonJail
 {
-    public enum EGameNodeType
-    {
-        None, Bullet, Laser, Bomb
-    }
-
-    //public interface Node
-    //{
-    //    public void UpdateNode();
-    //}
-
     public abstract class GameNode : MonoBehaviour
     {
         public bool targetPlayer;
         public bool randomPosition;
-        public abstract EGameNodeType GetNodeType { get; }
-        public abstract void UpdatePosition();
-        public abstract void UpdateNode();
+        public abstract GameNodeType GetNodeType { get; }
 
+        protected virtual void Start()
+        {
+            GameManager.gameNodeList.Add(this);
+
+            UpdateAll();
+        }
+
+        protected virtual void OnEnable()
+        {
+            UpdateAll();
+        }
+
+        public abstract void UpdateValue();
+        public abstract void UpdatePosition();
+        public virtual void UpdateAll()
+        {
+            UpdateValue();
+            UpdatePosition();
+        }
+
+        [SerializeField]
         private float time;
         public float Time
         {

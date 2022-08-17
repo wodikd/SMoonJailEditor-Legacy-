@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
-using SX3Game;
-using SX3Game.Editor;
+using SMoonJail;
+using SMoonJail.Editor;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,8 +15,7 @@ public class SaveLoadManager : MonoBehaviour
     private char[] nodeSeparator = new char[] { ':' };
     private char dataSeparator = '/';
 
-    private readonly WaitForEndOfFrame wait = new();
-
+    System.Diagnostics.Stopwatch totalTimeStopwatch = new();
     public SaveLoadManager(List<GameNode> gameNodeList)
     {
         this.gameNodeList = gameNodeList;
@@ -37,22 +36,22 @@ public class SaveLoadManager : MonoBehaviour
         {
             switch (gameNodeList[i].GetNodeType)
             {
-                case EGameNodeType.None:
+                case GameNodeType.None:
                     break;
-                case EGameNodeType.Bullet:
+                case GameNodeType.Bullet:
                     SaveBullet(gameNodeList[i].GetComponent<Bullet>());
                     break;
-                case EGameNodeType.Laser:
+                case GameNodeType.Laser:
                     SaveLaser(gameNodeList[i].GetComponent<Laser>());
                     break;
-                case EGameNodeType.Bomb:
+                case GameNodeType.Bomb:
                     SaveBomb(gameNodeList[i].GetComponent<Bomb>());
                     break;
                 default:
                     break;
             }
 
-            yield return wait;
+            yield return null;
         }
 
         streamWriter.Close();
@@ -104,10 +103,8 @@ public class SaveLoadManager : MonoBehaviour
 
     public IEnumerator Load(string path)
     {
-        System.Diagnostics.Stopwatch totalTimeStopwatch = new();
-        System.Diagnostics.Stopwatch nodeSplitStopWatch = new();
-        System.Diagnostics.Stopwatch convertNodeBuilderStopwatch = new();
-        System.Diagnostics.Stopwatch nodeBuilderStopwatch = new();
+
+        Queue<NodeBuilder> nodeBuilderQueue = new();
 
         StreamReader streamReader = new(path);
 
@@ -117,31 +114,24 @@ public class SaveLoadManager : MonoBehaviour
 
         nodeList.RemoveAt(nodeList.Count - 1);
 
-        totalTimeStopwatch.Start();
 
         for (int i = 0; i < nodeList.Count; i++)
         {
-            nodeSplitStopWatch.Start();
             var node = nodeList[i].Split(separator: dataSeparator);
-            nodeSplitStopWatch.Stop();
 
             switch (ConvertToNodeType(node[0]))
             {
-                case EGameNodeType.None:
+                case GameNodeType.None:
                     break;
-                case EGameNodeType.Bullet:
-                    convertNodeBuilderStopwatch.Start();
+                case GameNodeType.Bullet:
                     NodeBuilder builder = ConvertNodeBuilder(node);
-                    convertNodeBuilderStopwatch.Stop();
 
-                    nodeBuilderStopwatch.Start();
                     builder.BuildBullet();
-                    nodeBuilderStopwatch.Stop();
 
                     break;
-                case EGameNodeType.Laser:
+                case GameNodeType.Laser:
                     break;
-                case EGameNodeType.Bomb:
+                case GameNodeType.Bomb:
                     break;
                 default:
                     break;
@@ -150,27 +140,10 @@ public class SaveLoadManager : MonoBehaviour
             //Debug.Log($"{(((float)i + 1) / nodeList.Count) * 100,0:0.0}%");
 
 
+            yield return null;
         }
-        totalTimeStopwatch.Stop();
-
-        yield return wait;
 
         System.Text.StringBuilder stringBuilder = new();
-
-        var totalTime = totalTimeStopwatch.ElapsedTicks;
-        var nodeSplitTime = nodeSplitStopWatch.ElapsedTicks;
-        var convertTime = convertNodeBuilderStopwatch.ElapsedTicks;
-        var nodeBuilderTime = nodeBuilderStopwatch.ElapsedTicks;
-        var convertAndBuiler = convertTime + nodeBuilderTime;
-
-        stringBuilder.AppendLine($"totalTime:\n{totalTime}")
-            .AppendLine($"ConvertNodeTime:\n{convertTime}({(float)convertTime / totalTime})")
-            .AppendLine($"NodeSplitTime:\n{nodeSplitTime}({(float)nodeSplitTime / totalTime})")
-            .AppendLine($"NodeBuilderTime:\n{nodeBuilderTime}({(float)nodeBuilderTime / totalTime})")
-            .AppendLine($"Convert+Builder:\n{convertAndBuiler}({(float)convertAndBuiler / totalTime})")
-            ;
-
-        Debug.Log(stringBuilder);
     }
     // 'type,time,startpos,angle,speed'
 
@@ -192,7 +165,7 @@ public class SaveLoadManager : MonoBehaviour
 
         switch (ConvertToNodeType(nodeInfo[0]))
         {
-            case EGameNodeType.Bullet:
+            case GameNodeType.Bullet:
 
                 var time = float.Parse(nodeInfo[1]);
                 var startPos = new Vector2(
@@ -208,9 +181,9 @@ public class SaveLoadManager : MonoBehaviour
                     .SetSpeed(speed);
 
                 break;
-            case EGameNodeType.Laser:
+            case GameNodeType.Laser:
                 break;
-            case EGameNodeType.Bomb:
+            case GameNodeType.Bomb:
                 break;
             default:
                 break;
@@ -219,21 +192,21 @@ public class SaveLoadManager : MonoBehaviour
         return builder;
     }
 
-    public EGameNodeType ConvertToNodeType(string nodeType) =>
+    public GameNodeType ConvertToNodeType(string nodeType) =>
         nodeType switch
         {
-            "Bullet" => EGameNodeType.Bullet,
-            "Laser" => EGameNodeType.Laser,
-            "Bomb" => EGameNodeType.Bomb,
+            "Bullet" => GameNodeType.Bullet,
+            "Laser" => GameNodeType.Laser,
+            "Bomb" => GameNodeType.Bomb,
             _ => throw new System.Exception($"\"{nodeType}\" is not nodeType"),
         };
 
-    public EGameNodeType ConvertToNodeType(GameNode nodeType) =>
+    public GameNodeType ConvertToNodeType(GameNode nodeType) =>
         nodeType switch
         {
-            Bullet => EGameNodeType.Bullet,
-            Laser => EGameNodeType.Laser,
-            Bomb => EGameNodeType.Bomb,
+            Bullet => GameNodeType.Bullet,
+            Laser => GameNodeType.Laser,
+            Bomb => GameNodeType.Bomb,
             _ => throw new System.Exception("is not nodeType"),
         };
 

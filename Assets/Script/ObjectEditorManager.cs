@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace SX3Game
+namespace SMoonJail
 {
     namespace Editor
     {
@@ -67,32 +67,32 @@ namespace SX3Game
             {
                 switch (nodeList[0].GetNodeType)
                 {
-                    case EGameNodeType.None:
+                    case GameNodeType.None:
                         break;
-                    case EGameNodeType.Bullet:
+                    case GameNodeType.Bullet:
                         bulletEditor.UpdateNodeInfo();
                         break;
-                    case EGameNodeType.Laser:
+                    case GameNodeType.Laser:
                         break;
-                    case EGameNodeType.Bomb:
+                    case GameNodeType.Bomb:
                         break;
                     default:
                         break;
                 }
             }
 
-            public static void UpdateNodeInfo(EGameNodeType nodeType)
+            public static void UpdateNodeInfo(GameNodeType nodeType)
             {
                 switch (nodeType)
                 {
-                    case EGameNodeType.None:
+                    case GameNodeType.None:
                         break;
-                    case EGameNodeType.Bullet:
+                    case GameNodeType.Bullet:
                         bulletEditor.UpdateNodeInfo();
                         break;
-                    case EGameNodeType.Laser:
+                    case GameNodeType.Laser:
                         break;
-                    case EGameNodeType.Bomb:
+                    case GameNodeType.Bomb:
                         break;
                     default:
                         break;

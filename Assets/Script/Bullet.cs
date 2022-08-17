@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SX3Game
+namespace SMoonJail
 {
     public class Bullet : GameNode
     {
@@ -52,14 +52,8 @@ namespace SX3Game
         public void Awake()
         {
             //((IGameNode)this).UpdateNode();
-            GameManager.GameNodeList.Add(this);
 
             rigidbody = GetComponent<Rigidbody2D>();
-        }
-
-        public void Start()
-        {
-            //Set(transform.position, Tool.DirToAngle((Vector2.zero - (Vector2)transform.position).normalized), 0.1f, GameManager.GameTime);
         }
 
         public void Set(float time, Vector2 startPos, float angle, float speed)
@@ -69,12 +63,11 @@ namespace SX3Game
             this.angle = angle;
             this.speed = speed;
 
-            UpdateNode();
+            UpdateAll();
         }
 
-        public override void UpdateNode()
+        public override void UpdateValue()
         {
-            UpdatePosition();
             transform.rotation = Quaternion.AngleAxis(angle, transform.forward);
         }
         public override void UpdatePosition()
@@ -82,6 +75,7 @@ namespace SX3Game
             rigidbody.MovePosition(startPos + ((GameManager.GameTime - Time) * -speed * GameManager.mapInfo.BPM) * (Vector2)transform.right);
         }
 
+        #region Legacy
         //void IGameNode.UpdateNode()
         //{
         //    UpdateNode();
@@ -92,7 +86,7 @@ namespace SX3Game
         //    UpdatePosition();
         //}
 
-        
+
 
         //public void Set(Vector2 startPos)
         //{
@@ -125,11 +119,13 @@ namespace SX3Game
         //    }
         //}
 
-        public override EGameNodeType GetNodeType
+        #endregion
+
+        public override GameNodeType GetNodeType
         {
             get
             {
-                return EGameNodeType.Bullet;
+                return GameNodeType.Bullet;
             }
         }
     }

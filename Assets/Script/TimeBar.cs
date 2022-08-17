@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using GameTool;
 
-namespace SX3Game
+namespace SMoonJail
 {
     namespace Editor
     {
@@ -157,19 +157,11 @@ namespace SX3Game
             public void OnPointerEnter(PointerEventData eventData)
             {
                 isMouseEnter = true;
-
-                # if UNITY_EDITOR
-                Debug.Log("MouseEnter");
-                # endif
             }
 
             public void OnPointerExit(PointerEventData eventData)
             {
                 isMouseEnter = false;
-
-                # if UNITY_EDITOR
-                Debug.Log("MouseExit");
-                # endif
             }
 
             public void OnPointerDown(PointerEventData eventData)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SX3Game
+namespace SMoonJail
 {
     namespace Editor
     {

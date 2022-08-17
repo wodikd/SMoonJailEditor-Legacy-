@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SX3Game
+namespace SMoonJail
 {
     namespace Editor
     {
@@ -125,7 +125,7 @@ namespace SX3Game
                 {
                     var node = ObjectEditorManager.NodeList[i].GetComponent<Bullet>();
                     node.StartPos = new Vector2(posX, node.StartPos.y);
-                    node.UpdateNode();
+                    node.UpdateAll();
                     UpdateNodeInfo();
                 }
             }
@@ -138,7 +138,7 @@ namespace SX3Game
                 {
                     var node = ObjectEditorManager.NodeList[i].GetComponent<Bullet>();
                     node.StartPos = new Vector2(node.StartPos.x, posY);
-                    node.UpdateNode();
+                    node.UpdateAll();
                     UpdateNodeInfo();
                 }
             }
@@ -151,7 +151,7 @@ namespace SX3Game
                 {
                     var node = ObjectEditorManager.NodeList[i].GetComponent<Bullet>();
                     node.Time = time;
-                    node.UpdateNode();
+                    node.UpdateAll();
                     UpdateNodeInfo();
                 }
             }
@@ -164,7 +164,7 @@ namespace SX3Game
                 {
                     var node = ObjectEditorManager.NodeList[i].GetComponent<Bullet>();
                     node.Speed = speed;
-                    node.UpdateNode();
+                    node.UpdateAll();
                     UpdateNodeInfo();
                 }
             }
@@ -177,7 +177,7 @@ namespace SX3Game
                 {
                     var node = ObjectEditorManager.NodeList[i].GetComponent<Bullet>();
                     node.Angle = angle;
-                    node.UpdateNode();
+                    node.UpdateAll();
                     UpdateNodeInfo();
                 }
             }

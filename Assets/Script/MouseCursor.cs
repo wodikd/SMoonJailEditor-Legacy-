@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEditor;
 using GameTool;
-using SX3Game.Editor;
-using SX3Game;
+using SMoonJail.Editor;
+using SMoonJail;
 using UnityEngine.EventSystems;
 
 public class MouseCursor
@@ -192,7 +192,7 @@ public class MouseCursor
                 cursorBehavior = () =>
                 {
                     bullet.Angle = GameTool.Tool.DirToAngle(bullet.StartPos - GameTool.Tool.WorldCursorPos(GameManager.inGameCamera));
-                    bullet.UpdateNode();
+                    bullet.UpdateAll();
                     ObjectEditorManager.UpdateNodeInfo(bullet.GetNodeType);
 
                     if (Input.GetMouseButtonUp(0))
