@@ -17,6 +17,18 @@ namespace SMoonJail
 
         private bool isValueUpdate = false;
 
+        public int DelayBeat
+        {
+            get
+            {
+                return delayBeat;
+            }
+            set
+            {
+                delayBeat = value;
+            }
+        }
+
         private float EndTime
         {
             get
